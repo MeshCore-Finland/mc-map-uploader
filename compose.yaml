@@ -1,0 +1,29 @@
+services:
+  uploader:
+    build: .
+    user: "${MC_UID:-1000}:${MC_GID:-1000}"
+    network_mode: host # Allows a broker bound to the host loopback address.
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - type: bind
+        source: ./config.yaml
+        target: /app/config.yaml
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./secrets
+        target: /app/secrets
+        read_only: true
+        bind:
+          create_host_path: false
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+        mode: non-blocking
+        max-buffer-size: "1m"

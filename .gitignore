@@ -1,0 +1,7 @@
+.env
+config.yaml
+secrets/
+node_modules/
+dist/
+*.log
+*.key

@@ -1,0 +1,22 @@
+mqtt:
+  address: 127.0.0.1:1883
+  username: uploader
+  password_file: ./secrets/mqtt-password
+  client_id: mc-map-uploader
+  status_filter: meshcore/+/+/status
+  packets_filter: meshcore/+/+/packets
+
+map:
+  api_url: https://map.meshcore.io/api/v1/uploader/node
+  key_file: ./secrets/map-signing.key
+  allowed_iata:
+    - HEL # Add uppercase region codes here; longer codes are fine.
+  # Optional geofence: one or more polygons of [latitude, longitude] points.
+  # Omit this setting to accept valid adverts from any location.
+  # geofence_polygons:
+  #   - [[60.0, 24.0], [60.0, 25.0], [61.0, 25.0], [61.0, 24.0]]
+  dry_run: true # Set false only after validating live adverts.
+  http_timeout: 10s
+  upload_queue: 250
+  upload_attempts: 3
+  retry_delay: 5s

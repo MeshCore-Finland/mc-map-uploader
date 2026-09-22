@@ -1,0 +1,11 @@
+.git/
+.env
+config.yaml
+secrets/
+*.key
+*.log
+node_modules/
+dist/
+docs/
+testdata/
+README.md
