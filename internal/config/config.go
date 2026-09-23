@@ -35,6 +35,7 @@ type fileConfig struct {
 		DryRun           *bool              `yaml:"dry_run"`
 		HTTPTimeout      string             `yaml:"http_timeout"`
 		UploadQueue      int                `yaml:"upload_queue"`
+		UploadWorkers    int                `yaml:"upload_workers"`
 		UploadAttempts   int                `yaml:"upload_attempts"`
 		RetryDelay       string             `yaml:"retry_delay"`
 	} `yaml:"map"`
@@ -109,8 +110,8 @@ func Load(path string) (Runtime, error) {
 	if err != nil || retryDelay < time.Second || retryDelay > time.Minute {
 		return out, errors.New("map.retry_delay must be between 1s and 1m")
 	}
-	if raw.Map.UploadQueue < 1 || raw.Map.UploadQueue > 10000 || raw.Map.UploadAttempts < 1 || raw.Map.UploadAttempts > 20 {
-		return out, errors.New("map.upload_queue must be 1..10000 and upload_attempts must be 1..20")
+	if raw.Map.UploadQueue < 1 || raw.Map.UploadQueue > 10000 || raw.Map.UploadWorkers < 1 || raw.Map.UploadWorkers > 20 || raw.Map.UploadAttempts < 1 || raw.Map.UploadAttempts > 20 {
+		return out, errors.New("map.upload_queue must be 1..10000, upload_workers must be 1..20, and upload_attempts must be 1..20")
 	}
 	base := filepath.Dir(path)
 	password, err := readPassword(resolve(base, raw.MQTT.PasswordFile))
@@ -122,7 +123,7 @@ func Load(path string) (Runtime, error) {
 		return out, fmt.Errorf("map.key_file: %w", err)
 	}
 	out.MQTT = mqtt.Config{Address: raw.MQTT.Address, Username: raw.MQTT.Username, Password: password, ClientID: raw.MQTT.ClientID, StatusFilter: raw.MQTT.StatusFilter, PacketsFilter: raw.MQTT.PacketsFilter}
-	out.Uploader = uploader.Config{APIURL: raw.Map.APIURL, KeyFile: keyPath, AllowedIATA: strings.Join(raw.Map.AllowedIATA, ","), GeofencePolygons: raw.Map.GeofencePolygons, DryRun: *raw.Map.DryRun, HTTPTimeout: httpTimeout, QueueSize: raw.Map.UploadQueue, Attempts: raw.Map.UploadAttempts, RetryDelay: retryDelay}
+	out.Uploader = uploader.Config{APIURL: raw.Map.APIURL, KeyFile: keyPath, AllowedIATA: strings.Join(raw.Map.AllowedIATA, ","), GeofencePolygons: raw.Map.GeofencePolygons, DryRun: *raw.Map.DryRun, HTTPTimeout: httpTimeout, QueueSize: raw.Map.UploadQueue, Workers: raw.Map.UploadWorkers, Attempts: raw.Map.UploadAttempts, RetryDelay: retryDelay}
 	return out, nil
 }
 

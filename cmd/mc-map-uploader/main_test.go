@@ -17,7 +17,7 @@ func TestStartupConfigLogOmitsSecrets(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(&output, nil))
 	logStartupConfig(logger, "/app/config.yaml", config.Runtime{
 		MQTT:     mqtt.Config{Address: "127.0.0.1:1883", Username: "uploader", Password: "secret-password", ClientID: "mc-map-uploader", StatusFilter: "meshcore/+/+/status", PacketsFilter: "meshcore/+/+/packets"},
-		Uploader: uploader.Config{APIURL: "https://map.meshcore.io/api/v1/uploader/node", KeyFile: "/app/secrets/map-signing.key", AllowedIATA: "HEL", DryRun: false, HTTPTimeout: 10 * time.Second, QueueSize: 250, Attempts: 3, RetryDelay: 5 * time.Second},
+		Uploader: uploader.Config{APIURL: "https://map.meshcore.io/api/v1/uploader/node", KeyFile: "/app/secrets/map-signing.key", AllowedIATA: "HEL", DryRun: false, HTTPTimeout: 10 * time.Second, QueueSize: 250, Workers: 3, Attempts: 3, RetryDelay: 5 * time.Second},
 	})
 	if bytes.Contains(output.Bytes(), []byte("secret-password")) {
 		t.Fatal("MQTT password leaked into startup log")

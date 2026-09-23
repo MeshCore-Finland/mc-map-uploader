@@ -18,5 +18,6 @@ map:
   dry_run: true # Set false only after validating live adverts.
   http_timeout: 10s
   upload_queue: 250
+  upload_workers: 3
   upload_attempts: 3
   retry_delay: 5s

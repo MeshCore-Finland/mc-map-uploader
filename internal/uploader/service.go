@@ -19,6 +19,7 @@ type Config struct {
 	DryRun           bool
 	HTTPTimeout      time.Duration
 	QueueSize        int
+	Workers          int
 	Attempts         int
 	RetryDelay       time.Duration
 	GeofencePolygons []Polygon
@@ -82,7 +83,10 @@ func ParseAllowlist(codes []string) (map[string]struct{}, error) {
 }
 
 func New(cfg Config, logger *slog.Logger) (*Service, error) {
-	if cfg.APIURL == "" || cfg.HTTPTimeout <= 0 || cfg.QueueSize < 1 || cfg.QueueSize > 10000 || cfg.Attempts < 1 || cfg.Attempts > 20 {
+	if cfg.Workers == 0 {
+		cfg.Workers = 1
+	}
+	if cfg.APIURL == "" || cfg.HTTPTimeout <= 0 || cfg.QueueSize < 1 || cfg.QueueSize > 10000 || cfg.Workers < 1 || cfg.Workers > 20 || cfg.Attempts < 1 || cfg.Attempts > 20 {
 		return nil, errors.New("invalid uploader configuration")
 	}
 	allowed, err := parseAllowlist(cfg.AllowedIATA)
@@ -241,7 +245,9 @@ func (s *Service) sweep(now time.Time) {
 }
 
 func (s *Service) Run(ctx context.Context, messages <-chan mqtt.Message) {
-	go s.worker(ctx)
+	for range s.cfg.Workers {
+		go s.worker(ctx)
+	}
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 	for {

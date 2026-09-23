@@ -23,6 +23,7 @@ map:
   dry_run: true
   http_timeout: 10s
   upload_queue: 250
+  upload_workers: 3
   upload_attempts: 3
   retry_delay: 5s
 `
@@ -57,6 +58,7 @@ func TestStrictConfig(t *testing.T) {
 		"second document":   validYAML + "---\nmap: {}\n",
 		"duplicate field":   strings.Replace(validYAML, "  dry_run: true", "  dry_run: true\n  dry_run: false", 1),
 		"bad geofence":      strings.Replace(validYAML, "  dry_run: true", "  geofence_polygons: [[[91, 24], [60, 25], [61, 25]]]\n  dry_run: true", 1),
+		"bad worker count":  strings.Replace(validYAML, "  upload_workers: 3", "  upload_workers: 0", 1),
 	} {
 		if err := check(input); err == nil {
 			t.Errorf("%s was accepted", name)

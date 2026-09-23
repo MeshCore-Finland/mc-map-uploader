@@ -114,6 +114,7 @@ func logStartupConfig(logger *slog.Logger, path string, runtime config.Runtime) 
 			"dry_run", runtime.Uploader.DryRun,
 			"http_timeout", runtime.Uploader.HTTPTimeout.String(),
 			"upload_queue", runtime.Uploader.QueueSize,
+			"upload_workers", runtime.Uploader.Workers,
 			"upload_attempts", runtime.Uploader.Attempts,
 			"retry_delay", runtime.Uploader.RetryDelay.String(),
 		),
